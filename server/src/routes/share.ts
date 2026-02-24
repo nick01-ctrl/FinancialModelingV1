@@ -5,6 +5,15 @@ import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
+function safeJsonParse(data: unknown): unknown {
+  if (typeof data !== 'string') return data;
+  try {
+    return JSON.parse(data);
+  } catch {
+    return {};
+  }
+}
+
 // Get shared model (no auth required)
 router.get('/:token', (req: Request, res: Response) => {
   const db = getDB();
@@ -31,7 +40,7 @@ router.get('/:token', (req: Request, res: Response) => {
     return;
   }
 
-  model.data = JSON.parse(model.data as string);
+  model.data = safeJsonParse(model.data);
   res.json(model);
 });
 
@@ -79,7 +88,7 @@ router.post('/:token/duplicate', authenticateToken, (req: AuthRequest, res: Resp
     )
     .get(newId) as Record<string, unknown>;
 
-  model.data = JSON.parse(model.data as string);
+  model.data = safeJsonParse(model.data);
   res.status(201).json(model);
 });
 

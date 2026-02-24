@@ -1,5 +1,6 @@
 import { useModelStore } from '../../../stores/modelStore';
 import NumberInput from '../../../components/ui/NumberInput';
+import { useSuggestField } from './useSuggest';
 
 interface Props {
   disabled?: boolean;
@@ -9,6 +10,7 @@ export default function WACCSection({ disabled = false }: Props) {
   const inputs = useModelStore((s) => s.dcfInputs);
   const setInput = useModelStore((s) => s.setDCFInput);
   const aiFields = useModelStore((s) => s.aiFields);
+  const { suggestField, isPending } = useSuggestField();
 
   // Calculate WACC for display
   const costOfEquity =
@@ -29,7 +31,8 @@ export default function WACCSection({ disabled = false }: Props) {
           suffix="%"
           step={0.1}
           isAI={aiFields.has('riskFreeRate')}
-          disabled={disabled}
+          disabled={disabled || isPending}
+          onSuggest={() => suggestField('riskFreeRate')}
           tooltip="10-year Treasury yield"
         />
         <NumberInput
@@ -39,7 +42,8 @@ export default function WACCSection({ disabled = false }: Props) {
           suffix="%"
           step={0.1}
           isAI={aiFields.has('equityRiskPremium')}
-          disabled={disabled}
+          disabled={disabled || isPending}
+          onSuggest={() => suggestField('equityRiskPremium')}
         />
       </div>
       <div className="section-row">
@@ -50,7 +54,8 @@ export default function WACCSection({ disabled = false }: Props) {
           step={0.05}
           min={0}
           isAI={aiFields.has('beta')}
-          disabled={disabled}
+          disabled={disabled || isPending}
+          onSuggest={() => suggestField('beta')}
         />
         <NumberInput
           label="Pre-Tax Cost of Debt"
@@ -59,7 +64,8 @@ export default function WACCSection({ disabled = false }: Props) {
           suffix="%"
           step={0.1}
           isAI={aiFields.has('preTaxCostOfDebt')}
-          disabled={disabled}
+          disabled={disabled || isPending}
+          onSuggest={() => suggestField('preTaxCostOfDebt')}
         />
       </div>
       <NumberInput
@@ -69,7 +75,8 @@ export default function WACCSection({ disabled = false }: Props) {
         step={0.05}
         min={0}
         isAI={aiFields.has('debtToEquity')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('debtToEquity')}
       />
 
       <div

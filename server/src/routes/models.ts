@@ -6,6 +6,15 @@ import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 const router = Router();
 router.use(authenticateToken);
 
+function safeJsonParse(data: unknown): unknown {
+  if (typeof data !== 'string') return data;
+  try {
+    return JSON.parse(data);
+  } catch {
+    return {};
+  }
+}
+
 // List models
 router.get('/', (req: AuthRequest, res: Response) => {
   const db = getDB();
@@ -35,7 +44,7 @@ router.get('/:id', (req: AuthRequest, res: Response) => {
     return;
   }
 
-  model.data = JSON.parse(model.data as string);
+  model.data = safeJsonParse(model.data);
   res.json(model);
 });
 
@@ -58,7 +67,7 @@ router.post('/', (req: AuthRequest, res: Response) => {
     )
     .get(id) as Record<string, unknown>;
 
-  model.data = JSON.parse(model.data as string);
+  model.data = safeJsonParse(model.data);
   res.status(201).json(model);
 });
 
@@ -110,7 +119,7 @@ router.put('/:id', (req: AuthRequest, res: Response) => {
     )
     .get(req.params.id) as Record<string, unknown>;
 
-  model.data = JSON.parse(model.data as string);
+  model.data = safeJsonParse(model.data);
   res.json(model);
 });
 
@@ -152,7 +161,7 @@ router.get('/:id/versions', (req: AuthRequest, res: Response) => {
 
   const parsed = (versions as Record<string, unknown>[]).map((v) => ({
     ...v,
-    data: JSON.parse(v.data as string),
+    data: safeJsonParse(v.data),
   }));
 
   res.json(parsed);
@@ -192,7 +201,7 @@ router.post('/:id/versions/:vid/restore', (req: AuthRequest, res: Response) => {
     )
     .get(req.params.id) as Record<string, unknown>;
 
-  updated.data = JSON.parse(updated.data as string);
+  updated.data = safeJsonParse(updated.data);
   res.json(updated);
 });
 

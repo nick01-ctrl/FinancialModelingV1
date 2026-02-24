@@ -5,6 +5,14 @@ import * as aiService from '../services/ai.js';
 
 const router = Router();
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 router.get('/pdf', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const modelId = req.query.modelId as string;
@@ -26,7 +34,13 @@ router.get('/pdf', authenticateToken, async (req: AuthRequest, res: Response) =>
       return;
     }
 
-    const modelData = JSON.parse(model.data);
+    let modelData: Record<string, unknown>;
+    try {
+      modelData = JSON.parse(model.data);
+    } catch {
+      res.status(500).json({ error: 'Model data is corrupted' });
+      return;
+    }
     const userName = (
       db.prepare('SELECT name FROM users WHERE id = ?').get(req.userId) as { name: string }
     )?.name || 'Analyst';
@@ -80,7 +94,7 @@ function buildReportHTML(params: {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>${params.companyName} — DCF Valuation Report</title>
+  <title>${escapeHtml(params.companyName)} — DCF Valuation Report</title>
   <style>
     body { font-family: 'Georgia', serif; color: #1a1a2e; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem; }
     .cover { text-align: center; padding: 4rem 0; border-bottom: 2px solid #1a1a2e; margin-bottom: 2rem; }
@@ -99,16 +113,16 @@ function buildReportHTML(params: {
 </head>
 <body>
   <div class="cover">
-    <h1>${params.companyName}</h1>
+    <h1>${escapeHtml(params.companyName)}</h1>
     <div class="subtitle">DCF Valuation Analysis</div>
     <div class="meta">
-      <div>Prepared by: ${params.analystName}</div>
-      <div>${params.date}</div>
+      <div>Prepared by: ${escapeHtml(params.analystName)}</div>
+      <div>${escapeHtml(params.date)}</div>
     </div>
   </div>
 
   <h2>Executive Summary</h2>
-  <div class="narrative">${params.narrative.replace(/\n/g, '<br>')}</div>
+  <div class="narrative">${escapeHtml(params.narrative).replace(/\n/g, '<br>')}</div>
 
   <h2>Key Assumptions</h2>
   <table>

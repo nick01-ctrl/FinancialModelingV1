@@ -5,6 +5,9 @@ import * as aiService from '../services/ai.js';
 const router = Router();
 router.use(authenticateToken);
 
+const MAX_TEXT_LENGTH = 50_000;
+const MAX_STEER_LENGTH = 500;
+
 router.post('/suggest', async (req: AuthRequest, res: Response) => {
   try {
     const { field, context } = req.body;
@@ -40,6 +43,10 @@ router.post('/parse', async (req: AuthRequest, res: Response) => {
     const { rawText, targetFields } = req.body;
     if (!rawText) {
       res.status(400).json({ error: 'rawText is required' });
+      return;
+    }
+    if (typeof rawText === 'string' && rawText.length > MAX_TEXT_LENGTH) {
+      res.status(400).json({ error: `rawText exceeds maximum length of ${MAX_TEXT_LENGTH} characters` });
       return;
     }
     const result = await aiService.parseFinancialData(rawText, targetFields || []);
@@ -90,6 +97,10 @@ router.post('/narrative', async (req: AuthRequest, res: Response) => {
     const { modelData, steerPrompt } = req.body;
     if (!modelData) {
       res.status(400).json({ error: 'modelData is required' });
+      return;
+    }
+    if (steerPrompt && typeof steerPrompt === 'string' && steerPrompt.length > MAX_STEER_LENGTH) {
+      res.status(400).json({ error: `steerPrompt exceeds maximum length of ${MAX_STEER_LENGTH} characters` });
       return;
     }
     const narrative = await aiService.generateNarrative(modelData, steerPrompt);

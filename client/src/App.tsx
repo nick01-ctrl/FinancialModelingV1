@@ -5,6 +5,7 @@ import Register from './features/auth/Register';
 import Dashboard from './features/dashboard/Dashboard';
 import DCFModelPage from './features/dcf/DCFModelPage';
 import SharedModelPage from './features/sharing/SharedModelPage';
+import Toast from './components/ui/Toast';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
@@ -14,6 +15,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
+    <>
+    <Toast />
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -35,5 +38,6 @@ export default function App() {
         }
       />
     </Routes>
+    </>
   );
 }

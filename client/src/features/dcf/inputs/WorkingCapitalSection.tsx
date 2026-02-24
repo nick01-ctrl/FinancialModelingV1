@@ -1,5 +1,6 @@
 import { useModelStore } from '../../../stores/modelStore';
 import NumberInput from '../../../components/ui/NumberInput';
+import { useSuggestField } from './useSuggest';
 
 interface Props {
   disabled?: boolean;
@@ -9,6 +10,7 @@ export default function WorkingCapitalSection({ disabled = false }: Props) {
   const inputs = useModelStore((s) => s.dcfInputs);
   const setInput = useModelStore((s) => s.setDCFInput);
   const aiFields = useModelStore((s) => s.aiFields);
+  const { suggestField, isPending } = useSuggestField();
 
   return (
     <div>
@@ -20,7 +22,8 @@ export default function WorkingCapitalSection({ disabled = false }: Props) {
         step={0.5}
         min={0}
         isAI={aiFields.has('daPercentRevenue')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('daPercentRevenue')}
       />
       <NumberInput
         label="Capex as % of Revenue"
@@ -30,7 +33,8 @@ export default function WorkingCapitalSection({ disabled = false }: Props) {
         step={0.5}
         min={0}
         isAI={aiFields.has('capexPercentRevenue')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('capexPercentRevenue')}
       />
       <NumberInput
         label="Change in NWC as % of Revenue Change"
@@ -39,7 +43,8 @@ export default function WorkingCapitalSection({ disabled = false }: Props) {
         suffix="%"
         step={0.5}
         isAI={aiFields.has('nwcPercentRevenueChange')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('nwcPercentRevenueChange')}
       />
     </div>
   );

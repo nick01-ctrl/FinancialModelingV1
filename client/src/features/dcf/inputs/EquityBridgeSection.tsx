@@ -1,5 +1,6 @@
 import { useModelStore } from '../../../stores/modelStore';
 import NumberInput from '../../../components/ui/NumberInput';
+import { useSuggestField } from './useSuggest';
 
 interface Props {
   disabled?: boolean;
@@ -9,6 +10,7 @@ export default function EquityBridgeSection({ disabled = false }: Props) {
   const inputs = useModelStore((s) => s.dcfInputs);
   const setInput = useModelStore((s) => s.setDCFInput);
   const aiFields = useModelStore((s) => s.aiFields);
+  const { suggestField, isPending } = useSuggestField();
 
   return (
     <div>
@@ -20,7 +22,8 @@ export default function EquityBridgeSection({ disabled = false }: Props) {
         suffix="M"
         step={1}
         isAI={aiFields.has('netDebt')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('netDebt')}
         tooltip="Total debt minus cash & equivalents"
       />
       <NumberInput
@@ -31,7 +34,8 @@ export default function EquityBridgeSection({ disabled = false }: Props) {
         step={0.1}
         min={0.001}
         isAI={aiFields.has('dilutedShares')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('dilutedShares')}
       />
     </div>
   );

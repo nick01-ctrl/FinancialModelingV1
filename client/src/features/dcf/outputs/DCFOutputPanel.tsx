@@ -24,7 +24,7 @@ export default function DCFOutputPanel() {
 
       {outputs && !outputs.error && (
         <>
-          <ValuationSummary outputs={outputs} method={inputs.terminalValueMethod} />
+          <ValuationSummary outputs={outputs} method={inputs.terminalValueMethod} netDebt={inputs.netDebt} />
           <UFCFTable outputs={outputs} />
           {sensitivityTable && <SensitivityPanel table={sensitivityTable} />}
           {tornadoData.length > 0 && <TornadoPanel data={tornadoData} />}

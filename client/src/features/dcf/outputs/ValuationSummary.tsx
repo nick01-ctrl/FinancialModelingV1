@@ -3,6 +3,7 @@ import type { DCFOutputs } from '../../../engine/types';
 interface Props {
   outputs: DCFOutputs;
   method: 'gordon-growth' | 'exit-multiple';
+  netDebt: number;
 }
 
 function fmt(v: number | null, prefix = '$', suffix = 'M'): string {
@@ -15,7 +16,7 @@ function fmtPrice(v: number | null): string {
   return `$${v.toFixed(2)}`;
 }
 
-export default function ValuationSummary({ outputs, method }: Props) {
+export default function ValuationSummary({ outputs, method, netDebt }: Props) {
   const primary = method === 'gordon-growth';
 
   return (
@@ -83,7 +84,7 @@ export default function ValuationSummary({ outputs, method }: Props) {
             <tr>
               <td className="row-label">Less: Net Debt</td>
               <td colSpan={2} style={{ textAlign: 'center' }}>
-                ({fmt(null)})
+                ({fmt(netDebt)})
               </td>
             </tr>
             <tr className="total-row">

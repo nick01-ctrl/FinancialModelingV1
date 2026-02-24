@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useModelStore } from '../../../stores/modelStore';
 import NumberInput from '../../../components/ui/NumberInput';
+import { useSuggestField } from './useSuggest';
 import '../../../components/ui/inputs.css';
 
 interface Props {
@@ -11,6 +12,7 @@ export default function CostStructureSection({ disabled = false }: Props) {
   const inputs = useModelStore((s) => s.dcfInputs);
   const setInput = useModelStore((s) => s.setDCFInput);
   const aiFields = useModelStore((s) => s.aiFields);
+  const { suggestField, isPending } = useSuggestField();
 
   // Keep EBITDA margins array in sync with projection years
   useEffect(() => {
@@ -75,7 +77,8 @@ export default function CostStructureSection({ disabled = false }: Props) {
         min={0}
         max={100}
         isAI={aiFields.has('taxRate')}
-        disabled={disabled}
+        disabled={disabled || isPending}
+        onSuggest={() => suggestField('taxRate')}
       />
     </div>
   );

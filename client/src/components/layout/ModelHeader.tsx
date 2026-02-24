@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useModelStore } from '../../stores/modelStore';
 import { useUpdateModel, useShareModel } from '../../api/models';
+import { showToast } from '../ui/Toast';
 import './model-header.css';
 
 export default function ModelHeader() {
@@ -60,7 +61,7 @@ export default function ModelHeader() {
       onSuccess: (data) => {
         const url = `${window.location.origin}/share/${data.token}`;
         navigator.clipboard.writeText(url);
-        alert('Share link copied to clipboard!');
+        showToast('Share link copied to clipboard!');
       },
     });
   };

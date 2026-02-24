@@ -1,5 +1,6 @@
 import { useModelStore } from '../../../stores/modelStore';
 import NumberInput from '../../../components/ui/NumberInput';
+import { useSuggestField } from './useSuggest';
 import '../../../components/ui/inputs.css';
 
 interface Props {
@@ -10,6 +11,7 @@ export default function TerminalValueSection({ disabled = false }: Props) {
   const inputs = useModelStore((s) => s.dcfInputs);
   const setInput = useModelStore((s) => s.setDCFInput);
   const aiFields = useModelStore((s) => s.aiFields);
+  const { suggestField, isPending } = useSuggestField();
 
   return (
     <div>
@@ -41,7 +43,8 @@ export default function TerminalValueSection({ disabled = false }: Props) {
           suffix="%"
           step={0.1}
           isAI={aiFields.has('terminalGrowthRate')}
-          disabled={disabled}
+          disabled={disabled || isPending}
+          onSuggest={() => suggestField('terminalGrowthRate')}
           tooltip="Long-term sustainable growth rate (typically 2-3%)"
         />
       ) : (
@@ -53,7 +56,8 @@ export default function TerminalValueSection({ disabled = false }: Props) {
           step={0.5}
           min={0}
           isAI={aiFields.has('exitMultiple')}
-          disabled={disabled}
+          disabled={disabled || isPending}
+          onSuggest={() => suggestField('exitMultiple')}
         />
       )}
     </div>
