@@ -4,10 +4,11 @@ import UFCFTable from './UFCFTable';
 import ValuationSummary from './ValuationSummary';
 import SensitivityPanel from './SensitivityPanel';
 import TornadoPanel from './TornadoPanel';
+import FootballFieldPanel from './FootballFieldPanel';
 
 export default function DCFOutputPanel() {
   const inputs = useModelStore((s) => s.dcfInputs);
-  const { outputs, sensitivityTable, tornadoData, isCalculating } =
+  const { outputs, sensitivityTable, tornadoData, footballFieldData, isCalculating } =
     useCalculationWorker(inputs);
 
   return (
@@ -26,6 +27,7 @@ export default function DCFOutputPanel() {
         <>
           <ValuationSummary outputs={outputs} method={inputs.terminalValueMethod} netDebt={inputs.netDebt} />
           <UFCFTable outputs={outputs} />
+          {footballFieldData.length > 0 && <FootballFieldPanel data={footballFieldData} />}
           {sensitivityTable && <SensitivityPanel table={sensitivityTable} />}
           {tornadoData.length > 0 && <TornadoPanel data={tornadoData} />}
         </>

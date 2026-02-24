@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { DCFInputs, DCFOutputs, SensitivityTable, TornadoBar } from './types';
 import { calculateDCF } from './dcf';
 import { generateSensitivityTable, generateTornadoData } from './sensitivity';
+import { generateFootballFieldData, type FootballFieldRange } from './footballField';
 
 // Default tornado fields for DCF
 export const DCF_TORNADO_FIELDS = [
@@ -21,6 +22,7 @@ interface CalculationResult {
   outputs: DCFOutputs | null;
   sensitivityTable: SensitivityTable | null;
   tornadoData: TornadoBar[];
+  footballFieldData: FootballFieldRange[];
   isCalculating: boolean;
 }
 
@@ -28,6 +30,7 @@ export function useCalculationWorker(inputs: DCFInputs): CalculationResult {
   const [outputs, setOutputs] = useState<DCFOutputs | null>(null);
   const [sensitivityTable, setSensitivityTable] = useState<SensitivityTable | null>(null);
   const [tornadoData, setTornadoData] = useState<TornadoBar[]>([]);
+  const [footballFieldData, setFootballFieldData] = useState<FootballFieldRange[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -39,7 +42,6 @@ export function useCalculationWorker(inputs: DCFInputs): CalculationResult {
 
     timerRef.current = setTimeout(() => {
       // Run calculations synchronously (fast enough for DCF)
-      // Web Worker can be used for more complex models
       const result = calculateDCF(inputs);
       setOutputs(result);
 
@@ -69,6 +71,9 @@ export function useCalculationWorker(inputs: DCFInputs): CalculationResult {
           10
         );
         setTornadoData(tornado);
+
+        const footballField = generateFootballFieldData(inputs);
+        setFootballFieldData(footballField);
       }
 
       setIsCalculating(false);
@@ -79,5 +84,5 @@ export function useCalculationWorker(inputs: DCFInputs): CalculationResult {
     };
   }, [inputs]);
 
-  return { outputs, sensitivityTable, tornadoData, isCalculating };
+  return { outputs, sensitivityTable, tornadoData, footballFieldData, isCalculating };
 }

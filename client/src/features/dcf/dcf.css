@@ -156,6 +156,32 @@
   background: var(--color-ai-amber-bg) !important;
 }
 
+/* Football field legend */
+.football-field-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.football-field-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.football-field-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 /* Error display */
 .model-error {
   background: var(--color-error-bg);
