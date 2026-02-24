@@ -1,0 +1,76 @@
+.split-screen {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.split-screen.dragging {
+  user-select: none;
+  cursor: col-resize;
+}
+
+.split-left {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-border);
+}
+
+.split-right {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.split-divider {
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.split-divider:hover,
+.split-screen.dragging .split-divider {
+  background: var(--color-primary);
+  opacity: 0.3;
+}
+
+/* Mobile */
+.split-screen-mobile {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mobile-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.mobile-tab {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid transparent;
+}
+
+.mobile-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.mobile-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

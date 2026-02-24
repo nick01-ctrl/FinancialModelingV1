@@ -1,0 +1,215 @@
+.number-input-group {
+  margin-bottom: 0.75rem;
+}
+
+.input-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.input-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.suggest-btn {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.15rem 0.4rem;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.suggest-btn:hover {
+  background: #fde68a;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input-wrapper.input-warning {
+  border-color: var(--color-ai-amber-border);
+}
+
+.input-prefix,
+.input-suffix {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: none;
+  flex-shrink: 0;
+}
+
+.input-prefix {
+  border-right: 1px solid var(--color-border);
+}
+
+.input-suffix {
+  border-left: 1px solid var(--color-border);
+}
+
+.number-input {
+  flex: 1;
+  padding: 0.375rem 0.5rem;
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  background: transparent;
+  min-width: 0;
+  text-align: right;
+}
+
+.number-input:disabled {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+}
+
+.input-warning-text {
+  font-size: 0.7rem;
+  color: #92400e;
+  margin-top: 0.2rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-ai-amber-bg);
+  border-radius: var(--radius-sm);
+}
+
+.input-tooltip {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+/* Dropdown select */
+.select-group {
+  margin-bottom: 0.75rem;
+}
+
+.select-input {
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  outline: none;
+  background: var(--color-surface);
+}
+
+.select-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Text input */
+.text-input-group {
+  margin-bottom: 0.75rem;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.text-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Yearly grid */
+.yearly-grid {
+  margin-bottom: 0.75rem;
+}
+
+.yearly-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.yearly-grid-table th {
+  padding: 0.25rem 0.375rem;
+  text-align: center;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+}
+
+.yearly-grid-table td {
+  padding: 0.125rem 0.25rem;
+}
+
+.yearly-grid-table input {
+  width: 100%;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  text-align: center;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.yearly-grid-table input:focus {
+  border-color: var(--color-primary);
+}
+
+/* Toggle buttons */
+.toggle-group {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.toggle-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.15s;
+}
+
+.toggle-btn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Input section header */
+.section-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.section-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}

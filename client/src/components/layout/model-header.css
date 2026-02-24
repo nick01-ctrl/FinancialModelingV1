@@ -1,0 +1,62 @@
+.model-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.model-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.model-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.model-name {
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.model-name:hover {
+  background: var(--color-bg);
+}
+
+.model-name-input {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.save-status {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.model-type-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
