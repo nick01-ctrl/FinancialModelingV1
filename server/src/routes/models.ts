@@ -205,6 +205,23 @@ router.post('/:id/versions/:vid/restore', (req: AuthRequest, res: Response) => {
   res.json(updated);
 });
 
+// Unshare model (revoke share link)
+router.delete('/:id/share', (req: AuthRequest, res: Response) => {
+  const db = getDB();
+
+  const model = db
+    .prepare('SELECT id FROM models WHERE id = ? AND user_id = ?')
+    .get(req.params.id, req.userId);
+
+  if (!model) {
+    res.status(404).json({ error: 'Model not found' });
+    return;
+  }
+
+  db.prepare('DELETE FROM share_tokens WHERE model_id = ?').run(req.params.id);
+  res.json({ ok: true });
+});
+
 // Share model
 router.post('/:id/share', (req: AuthRequest, res: Response) => {
   const db = getDB();

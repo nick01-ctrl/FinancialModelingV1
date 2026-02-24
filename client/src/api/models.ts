@@ -116,6 +116,14 @@ export function useShareModel() {
   });
 }
 
+export function useUnshareModel() {
+  return useMutation({
+    mutationFn: async (modelId: string) => {
+      await apiClient.delete(`/models/${modelId}/share`);
+    },
+  });
+}
+
 export function useSharedModel(token: string) {
   return useQuery({
     queryKey: ['share', token],
