@@ -6,7 +6,7 @@ import Toast from './components/ui/Toast';
 const Login = lazy(() => import('./features/auth/Login'));
 const Register = lazy(() => import('./features/auth/Register'));
 const Dashboard = lazy(() => import('./features/dashboard/Dashboard'));
-const DCFModelPage = lazy(() => import('./features/dcf/DCFModelPage'));
+const ModelRouter = lazy(() => import('./features/ModelRouter'));
 const SharedModelPage = lazy(() => import('./features/sharing/SharedModelPage'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -44,7 +44,7 @@ export default function App() {
             path="/model/:id"
             element={
               <ProtectedRoute>
-                <DCFModelPage />
+                <ModelRouter />
               </ProtectedRoute>
             }
           />

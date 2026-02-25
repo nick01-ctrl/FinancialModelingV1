@@ -213,3 +213,17 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.5rem;
 }
+
+/* Compact number input for peer grids */
+.number-input-compact {
+  margin-bottom: 0;
+}
+
+.number-input-compact .input-label {
+  font-size: 0.7rem;
+}
+
+.number-input-compact .number-input {
+  padding: 0.25rem 0.35rem;
+  font-size: 0.8rem;
+}

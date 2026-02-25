@@ -15,6 +15,7 @@ interface NumberInputProps {
   tooltip?: string;
   disabled?: boolean;
   warning?: string | null;
+  compact?: boolean;
 }
 
 export default function NumberInput({
@@ -31,6 +32,7 @@ export default function NumberInput({
   tooltip,
   disabled = false,
   warning,
+  compact = false,
 }: NumberInputProps) {
   const [focused, setFocused] = useState(false);
   const [displayValue, setDisplayValue] = useState(String(value));
@@ -66,7 +68,7 @@ export default function NumberInput({
   };
 
   return (
-    <div className={`number-input-group ${warning ? 'has-warning' : ''}`}>
+    <div className={`number-input-group ${warning ? 'has-warning' : ''} ${compact ? 'number-input-compact' : ''}`}>
       <div className="input-label-row">
         <label className="input-label">
           {label}

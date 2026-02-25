@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { DCFInputs } from '../engine/types';
+import type { DCFInputs, CompsInputs } from '../engine/types';
 
 export type DataMode = 'manual' | 'paste-parse' | 'ai-auto';
 
@@ -14,6 +14,7 @@ interface ModelMeta {
 interface ModelState {
   meta: ModelMeta | null;
   dcfInputs: DCFInputs;
+  compsInputs: CompsInputs;
   aiFields: Set<string>;
   dataMode: DataMode;
   isDirty: boolean;
@@ -22,12 +23,14 @@ interface ModelState {
   setMeta: (meta: ModelMeta) => void;
   setDCFInput: <K extends keyof DCFInputs>(key: K, value: DCFInputs[K]) => void;
   setDCFInputs: (inputs: Partial<DCFInputs>) => void;
+  setCompsInput: <K extends keyof CompsInputs>(key: K, value: CompsInputs[K]) => void;
+  setCompsInputs: (inputs: Partial<CompsInputs>) => void;
   markAIField: (field: string) => void;
   clearAIField: (field: string) => void;
   setDataMode: (mode: DataMode) => void;
   setDirty: (dirty: boolean) => void;
   setLastSaved: (ts: string) => void;
-  loadModel: (meta: ModelMeta, inputs: DCFInputs, aiFields: string[]) => void;
+  loadModel: (meta: ModelMeta, inputs: DCFInputs | CompsInputs, aiFields: string[]) => void;
   resetInputs: () => void;
 }
 
@@ -59,9 +62,25 @@ export const DEFAULT_DCF_INPUTS: DCFInputs = {
   dilutedShares: 1,
 };
 
+export const DEFAULT_COMPS_INPUTS: CompsInputs = {
+  companyName: '',
+  companyDescription: '',
+  sector: '',
+  subjectRevenue: 0,
+  subjectEBITDA: 0,
+  subjectNetIncome: 0,
+  subjectNetDebt: 0,
+  subjectDilutedShares: 1,
+  peers: [],
+  useEVRevenue: true,
+  useEVEBITDA: true,
+  usePE: true,
+};
+
 export const useModelStore = create<ModelState>()((set) => ({
   meta: null,
   dcfInputs: { ...DEFAULT_DCF_INPUTS },
+  compsInputs: { ...DEFAULT_COMPS_INPUTS },
   aiFields: new Set<string>(),
   dataMode: 'manual',
   isDirty: false,
@@ -78,6 +97,18 @@ export const useModelStore = create<ModelState>()((set) => ({
   setDCFInputs: (inputs) =>
     set((state) => ({
       dcfInputs: { ...state.dcfInputs, ...inputs },
+      isDirty: true,
+    })),
+
+  setCompsInput: (key, value) =>
+    set((state) => ({
+      compsInputs: { ...state.compsInputs, [key]: value },
+      isDirty: true,
+    })),
+
+  setCompsInputs: (inputs) =>
+    set((state) => ({
+      compsInputs: { ...state.compsInputs, ...inputs },
       isDirty: true,
     })),
 
@@ -99,17 +130,24 @@ export const useModelStore = create<ModelState>()((set) => ({
   setDirty: (dirty) => set({ isDirty: dirty }),
   setLastSaved: (ts) => set({ lastSaved: ts, isDirty: false }),
 
-  loadModel: (meta, inputs, aiFields) =>
-    set({
+  loadModel: (meta, inputs, aiFields) => {
+    const update: Partial<ModelState> = {
       meta,
-      dcfInputs: inputs,
       aiFields: new Set(aiFields),
       isDirty: false,
-    }),
+    };
+    if (meta.modelType === 'comps') {
+      update.compsInputs = inputs as CompsInputs;
+    } else {
+      update.dcfInputs = inputs as DCFInputs;
+    }
+    set(update);
+  },
 
   resetInputs: () =>
     set({
       dcfInputs: { ...DEFAULT_DCF_INPUTS },
+      compsInputs: { ...DEFAULT_COMPS_INPUTS },
       aiFields: new Set(),
       isDirty: false,
     }),

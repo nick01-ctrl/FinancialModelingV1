@@ -4,6 +4,11 @@ import { useModels, useCreateModel, useDeleteModel } from '../../api/models';
 import { useAuthStore } from '../../stores/authStore';
 import './dashboard.css';
 
+const MODEL_TYPES = [
+  { value: 'dcf', label: 'DCF', description: 'Discounted Cash Flow' },
+  { value: 'comps', label: 'Comps', description: 'Comparable Companies' },
+] as const;
+
 export default function Dashboard() {
   const { data: models, isLoading } = useModels();
   const createModel = useCreateModel();
@@ -12,6 +17,7 @@ export default function Dashboard() {
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [showNewMenu, setShowNewMenu] = useState(false);
 
   const filtered = models?.filter(
     (m) =>
@@ -19,11 +25,24 @@ export default function Dashboard() {
       m.companyName.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreate = () => {
+  const handleCreate = (modelType: string) => {
+    const names: Record<string, string> = {
+      dcf: 'Untitled DCF Model',
+      comps: 'Untitled Comps Model',
+    };
     createModel.mutate(
-      { name: 'Untitled DCF Model', modelType: 'dcf' },
+      { name: names[modelType] || 'Untitled Model', modelType },
       { onSuccess: (model) => navigate(`/model/${model.id}`) }
     );
+    setShowNewMenu(false);
+  };
+
+  const summaryLabel = (modelType: string): string => {
+    switch (modelType) {
+      case 'dcf': return 'DCF';
+      case 'comps': return 'Comps';
+      default: return modelType.toUpperCase();
+    }
   };
 
   return (
@@ -49,9 +68,25 @@ export default function Dashboard() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button className="btn btn-primary" onClick={handleCreate}>
-            + New Model
-          </button>
+          <div className="new-model-wrapper">
+            <button className="btn btn-primary" onClick={() => setShowNewMenu((s) => !s)}>
+              + New Model
+            </button>
+            {showNewMenu && (
+              <div className="new-model-menu">
+                {MODEL_TYPES.map((t) => (
+                  <button
+                    key={t.value}
+                    className="new-model-option"
+                    onClick={() => handleCreate(t.value)}
+                  >
+                    <span className="new-model-option-label">{t.label}</span>
+                    <span className="new-model-option-desc">{t.description}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {isLoading && <div className="dashboard-loading">Loading models...</div>}
@@ -59,10 +94,15 @@ export default function Dashboard() {
         {!isLoading && (!filtered || filtered.length === 0) && (
           <div className="dashboard-empty">
             <h2>No models yet</h2>
-            <p>Create your first DCF model to get started.</p>
-            <button className="btn btn-primary" onClick={handleCreate}>
-              + New DCF Model
-            </button>
+            <p>Create your first financial model to get started.</p>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+              <button className="btn btn-primary" onClick={() => handleCreate('dcf')}>
+                + New DCF Model
+              </button>
+              <button className="btn btn-secondary" onClick={() => handleCreate('comps')}>
+                + New Comps Model
+              </button>
+            </div>
           </div>
         )}
 
@@ -95,7 +135,7 @@ export default function Dashboard() {
                 )}
                 {model.summary && (
                   <p className="model-card-summary">
-                    DCF: {model.summary}
+                    {summaryLabel(model.modelType)}: {model.summary}
                   </p>
                 )}
                 <p className="model-card-date">

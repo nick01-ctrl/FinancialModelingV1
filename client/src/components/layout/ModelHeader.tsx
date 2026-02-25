@@ -10,6 +10,7 @@ export default function ModelHeader() {
   const navigate = useNavigate();
   const meta = useModelStore((s) => s.meta);
   const dcfInputs = useModelStore((s) => s.dcfInputs);
+  const compsInputs = useModelStore((s) => s.compsInputs);
   const aiFields = useModelStore((s) => s.aiFields);
   const isDirty = useModelStore((s) => s.isDirty);
   const lastSaved = useModelStore((s) => s.lastSaved);
@@ -32,13 +33,18 @@ export default function ModelHeader() {
   useEffect(() => {
     if (!isDirty || !meta?.id) return;
     const timer = setTimeout(() => {
+      const isComps = meta.modelType === 'comps';
+      const activeInputs = isComps ? compsInputs : dcfInputs;
+      const dataPayload = isComps
+        ? { compsInputs, aiFields: Array.from(aiFields) }
+        : { dcfInputs, aiFields: Array.from(aiFields) };
       updateModel.mutate(
         {
           id: meta.id,
           data: {
             name: meta.name,
-            companyName: dcfInputs.companyName,
-            data: { dcfInputs, aiFields: Array.from(aiFields) },
+            companyName: activeInputs.companyName,
+            data: dataPayload,
           },
         },
         {
@@ -49,7 +55,7 @@ export default function ModelHeader() {
       );
     }, 2000);
     return () => clearTimeout(timer);
-  }, [isDirty, dcfInputs, meta?.id]);
+  }, [isDirty, dcfInputs, compsInputs, meta?.id]);
 
   const handleNameSave = () => {
     setEditingName(false);
@@ -106,7 +112,7 @@ export default function ModelHeader() {
               {meta?.name || 'Untitled Model'}
             </h2>
           )}
-          <span className="model-type-badge">DCF</span>
+          <span className="model-type-badge">{(meta?.modelType || 'dcf').toUpperCase()}</span>
         </div>
         <div className="model-header-right">
           <span className="save-status">

@@ -98,3 +98,69 @@ export interface TornadoBar {
   baseInput: number;
   impact: number;
 }
+
+// --- Comparable Company Analysis types ---
+
+export interface PeerCompany {
+  id: string;
+  name: string;
+  enterpriseValue: number;
+  revenue: number;
+  ebitda: number;
+  netIncome: number;
+  marketCap: number;
+}
+
+export interface CompsInputs {
+  companyName: string;
+  companyDescription: string;
+  sector: string;
+
+  // Subject company metrics
+  subjectRevenue: number;
+  subjectEBITDA: number;
+  subjectNetIncome: number;
+  subjectNetDebt: number;
+  subjectDilutedShares: number;
+
+  // Peer companies
+  peers: PeerCompany[];
+
+  // Which multiples to use
+  useEVRevenue: boolean;
+  useEVEBITDA: boolean;
+  usePE: boolean;
+}
+
+export interface PeerMultiples {
+  id: string;
+  name: string;
+  evRevenue: number | null;
+  evEbitda: number | null;
+  pe: number | null;
+}
+
+export interface MultipleStats {
+  label: string;
+  values: number[];
+  p25: number;
+  median: number;
+  p75: number;
+  mean: number;
+}
+
+export interface ImpliedValuation {
+  metric: string;
+  p25SharePrice: number | null;
+  medianSharePrice: number | null;
+  p75SharePrice: number | null;
+}
+
+export interface CompsOutputs {
+  peerMultiples: PeerMultiples[];
+  evRevenueStats: MultipleStats | null;
+  evEbitdaStats: MultipleStats | null;
+  peStats: MultipleStats | null;
+  impliedValuations: ImpliedValuation[];
+  error: string | null;
+}
