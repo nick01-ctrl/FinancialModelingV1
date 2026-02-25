@@ -34,7 +34,12 @@
 | **Inline Model Rename** | Done | Click model name in header to edit |
 | **Code Splitting** | Done | Lazy-loaded routes for Login, Register, Dashboard, DCF, Shared |
 | **Error Boundary** | Done | Graceful crash recovery with retry |
-| **Unit Tests** | Done | 42 tests (vitest): DCF engine, sensitivity, football field |
+| **Unit Tests** | Done | 58 tests (vitest): DCF engine, sensitivity, football field, comps |
+| **Comps Model — Full Engine** | Done | EV/Revenue, EV/EBITDA, P/E multiples with 25th/50th/75th/mean stats |
+| **Comps Input Panel** | Done | Subject company metrics, peer company grid (add/remove), multiple selection toggles |
+| **Comps Output Panel** | Done | Peer multiples table, stats boxes, valuation range bars, implied share price table |
+| **Multi-Model Routing** | Done | ModelRouter dispatches to DCF or Comps page based on model_type |
+| **Dashboard Model Picker** | Done | "New Model" dropdown with DCF and Comps options, valuation summary badges |
 
 ### Not Yet Implemented
 
@@ -42,7 +47,6 @@
 |---|---|---|
 | LBO Model | 7.2 | High |
 | M&A / Merger Model | 7.3 | High |
-| Comparable Company Analysis | 7.4 | Medium |
 | Three-Statement Integration | 6.1 | High (LBO dependency) |
 | Circularity Solver | 6.2 | High (LBO dependency) |
 | Configurable Sensitivity Tables | 8.1 | Medium (currently auto-generated) |
