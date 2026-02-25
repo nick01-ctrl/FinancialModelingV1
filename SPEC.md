@@ -3,6 +3,56 @@
 
 ---
 
+## Implementation Status
+
+> Last updated: 2026-02-25
+
+### Completed
+
+| Feature | Status | Notes |
+|---|---|---|
+| **DCF Model — Full Engine** | Done | Pure-function `calculateDCF()` with WACC, projections, Gordon Growth & Exit Multiple TV, equity bridge |
+| **Split-Screen Layout** | Done | Resizable drag divider (25–75%), mobile tab fallback at <768px |
+| **Live Recalculation** | Done | Debounced 100ms, no "Run" button — always live |
+| **DCF Input Panel** | Done | 8 accordion sections: Company Info, Historical Financials, Revenue Forecast, Cost Structure, Working Capital, WACC, Terminal Value, Equity Bridge |
+| **DCF Output Panel** | Done | Valuation Summary, UFCF Table, Football Field Chart, Sensitivity Table, Tornado Chart |
+| **Sensitivity Analysis** | Done | 2D heat-map table (Terminal Growth vs Risk-Free Rate), color-coded green/red variance |
+| **Tornado Chart** | Done | Top 10 input drivers sorted by impact, horizontal stacked bars via Recharts |
+| **Football Field Chart** | Done | 5 valuation ranges (Gordon Growth, Exit Multiple, WACC, Revenue Growth, Margin), horizontal bar chart with base-case reference line |
+| **3 AI Data Modes** | Done | Manual / Paste & Parse / AI Auto-populate toggle with amber badge system |
+| **AI Per-Field Suggest** | Done | Server-side Claude API call for each field with reasoning |
+| **AI Auto-Populate** | Done | Company name → full assumption set via Claude |
+| **AI Paste & Parse** | Done | Raw text → mapped financial fields |
+| **AI Forecast Generation** | Done | Generates revenue growth rates + EBITDA margins from historicals |
+| **AI Input Validation** | Done | Contextual explanations for unusual values |
+| **PDF/HTML Export** | Done | Server-rendered HTML report with cover page, AI narrative, key assumptions, methodology, disclaimer |
+| **Authentication** | Done | Email/password with JWT, login/register pages |
+| **Dashboard** | Done | Model list with search, create/delete, type badges |
+| **Auto-Save** | Done | 2-second debounced save on every input change |
+| **Version History** | Done | Last 10 auto-saves retained, restore any version via modal |
+| **Model Sharing** | Done | Generate read-only share link, duplicate to workspace, revoke sharing |
+| **Inline Model Rename** | Done | Click model name in header to edit |
+| **Code Splitting** | Done | Lazy-loaded routes for Login, Register, Dashboard, DCF, Shared |
+| **Error Boundary** | Done | Graceful crash recovery with retry |
+| **Unit Tests** | Done | 42 tests (vitest): DCF engine, sensitivity, football field |
+
+### Not Yet Implemented
+
+| Feature | Spec Section | Priority |
+|---|---|---|
+| LBO Model | 7.2 | High |
+| M&A / Merger Model | 7.3 | High |
+| Comparable Company Analysis | 7.4 | Medium |
+| Three-Statement Integration | 6.1 | High (LBO dependency) |
+| Circularity Solver | 6.2 | High (LBO dependency) |
+| Configurable Sensitivity Tables | 8.1 | Medium (currently auto-generated) |
+| Cross-Model Football Field | 9 | Medium (needs LBO/Comps) |
+| Puppeteer PDF Generation | 10.1 | Low (HTML export works) |
+| Google SSO | 11.1 | Low |
+| Model Folders/Organization | 11.2 | Low |
+
+---
+
 ## 1. Product Overview
 
 FinModel AI is a web-based financial modeling platform targeting junior analysts who understand financial theory but need speed. It provides a split-screen interface — inputs on the left, live-updating outputs on the right — across four core modeling workflows, with Claude AI acting as an intelligent co-pilot for assumptions, data entry, and narrative generation.
@@ -335,20 +385,21 @@ Email + password authentication with optional SSO (Google). No anonymous session
 
 ### 12.1 Frontend
 
-- **Framework:** React (TypeScript)
-- **State management:** Zustand (model state), React Query (API calls)
-- **Calculation engine:** Pure TypeScript, runs entirely client-side in a Web Worker. No server round-trips for model computation.
-- **Iterative solver:** Runs in a dedicated Web Worker to avoid blocking the UI during convergence iterations
-- **Charts:** Recharts for output charts; custom SVG for the Football Field chart
-- **Sensitivity table heat maps:** Custom CSS grid with interpolated color values
+- **Framework:** React 18 (TypeScript), Vite 6
+- **State management:** Zustand 5 (model state), TanStack React Query 5 (API calls)
+- **Calculation engine:** Pure TypeScript, runs entirely client-side with 100ms debounce. No server round-trips for model computation.
+- **Charts:** Recharts 2 for all output charts (tornado, football field)
+- **Sensitivity table heat maps:** HTML table with interpolated green/red color values
+- **Testing:** Vitest (42 unit tests covering DCF engine, sensitivity, football field)
+- **Code splitting:** React.lazy with Suspense for route-level splitting
 
 ### 12.2 Backend
 
-- **API:** REST (Node.js / Express or equivalent)
-- **Database:** PostgreSQL — stores user accounts and model JSON blobs
-- **Auth:** JWT with refresh tokens
-- **AI calls:** Anthropic Claude API (claude-sonnet-4) — called server-side to protect API key. Calls are made for: per-field suggestions, paste & parse, AI auto-populate, forecast generation, validation explanations, and PDF narrative generation.
-- **PDF generation:** Server-side rendering (Puppeteer or equivalent) — the report is rendered as an HTML page then printed to PDF to preserve chart fidelity
+- **API:** REST (Node.js / Express)
+- **Database:** SQLite (better-sqlite3) with WAL mode — stores user accounts and model JSON blobs
+- **Auth:** JWT (jsonwebtoken + bcryptjs)
+- **AI calls:** Anthropic Claude API (@anthropic-ai/sdk) — called server-side to protect API key. Endpoints: `/api/ai/suggest`, `/api/ai/auto-populate`, `/api/ai/parse`, `/api/ai/validate`, `/api/ai/forecast`, `/api/ai/narrative`
+- **PDF generation:** Server-rendered HTML report (Puppeteer can be added for true PDF output)
 
 ### 12.3 Calculation Engine Design
 

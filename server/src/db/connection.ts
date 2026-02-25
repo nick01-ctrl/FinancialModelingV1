@@ -62,5 +62,12 @@ export function initDB(): void {
     CREATE INDEX IF NOT EXISTS idx_share_tokens_token ON share_tokens(token);
   `);
 
+  // Add summary column if it doesn't exist (safe migration)
+  try {
+    db.exec(`ALTER TABLE models ADD COLUMN summary TEXT DEFAULT ''`);
+  } catch {
+    // Column already exists, ignore
+  }
+
   console.log('Database initialized');
 }

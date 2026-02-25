@@ -1,9 +1,13 @@
 node_modules/
 dist/
 .env
+.env.*
 *.db
 *.db-shm
 *.db-wal
 *.sqlite
 .DS_Store
 *.log
+coverage/
+.vite/
+*.tsbuildinfo

@@ -7,6 +7,7 @@ export interface ModelSummary {
   modelType: string;
   companyName: string;
   description: string;
+  summary: string;
   createdAt: string;
   updatedAt: string;
 }

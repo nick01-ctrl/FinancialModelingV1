@@ -15,13 +15,87 @@ function safeJsonParse(data: unknown): unknown {
   }
 }
 
+function computeSummary(dataStr: string): string {
+  try {
+    const data = JSON.parse(dataStr);
+    const inputs = data.dcfInputs;
+    if (!inputs) return '';
+
+    // Check if model has meaningful data (non-zero revenue)
+    const lastRev = inputs.historicalRevenue?.[inputs.historicalRevenue?.length - 1];
+    if (!lastRev || lastRev === 0) return '';
+
+    // Quick implied share price estimate using Gordon Growth
+    const ke = (inputs.riskFreeRate || 0) + (inputs.beta || 1) * (inputs.equityRiskPremium || 0);
+    const eWeight = 1 / (1 + (inputs.debtToEquity || 0));
+    const dWeight = (inputs.debtToEquity || 0) / (1 + (inputs.debtToEquity || 0));
+    const afterTaxDebt = (inputs.preTaxCostOfDebt || 0) * (1 - (inputs.taxRate || 0) / 100);
+    const wacc = ke * eWeight + afterTaxDebt * dWeight;
+    const waccDec = wacc / 100;
+
+    // Project forward to get last year UFCF
+    let rev = lastRev;
+    const n = inputs.projectionYears || 5;
+    const growths = inputs.revenueGrowthRates || [];
+    const margins = inputs.ebitdaMargins || [];
+    let lastUFCF = 0;
+    let lastEBITDA = 0;
+    let sumPV = 0;
+
+    for (let i = 0; i < n; i++) {
+      const g = (growths[i] || 0) / 100;
+      const prevRev = rev;
+      rev = rev * (1 + g);
+      const margin = (margins[i] || 0) / 100;
+      const ebitda = rev * margin;
+      const da = rev * ((inputs.daPercentRevenue || 0) / 100);
+      const capex = rev * ((inputs.capexPercentRevenue || 0) / 100);
+      const nwcChange = (rev - prevRev) * ((inputs.nwcPercentRevenueChange || 0) / 100);
+      const ebit = ebitda - da;
+      const ufcf = ebit * (1 - (inputs.taxRate || 0) / 100) + da - capex - nwcChange;
+      const df = 1 / Math.pow(1 + waccDec, i + 1);
+      sumPV += ufcf * df;
+      lastUFCF = ufcf;
+      lastEBITDA = ebitda;
+    }
+
+    const termDF = 1 / Math.pow(1 + waccDec, n);
+    const shares = inputs.dilutedShares || 1;
+    const netDebt = inputs.netDebt || 0;
+
+    const method = inputs.terminalValueMethod || 'gordon-growth';
+    let price: number | null = null;
+
+    if (method === 'gordon-growth') {
+      const gRate = (inputs.terminalGrowthRate || 0) / 100;
+      if (waccDec > gRate) {
+        const tv = (lastUFCF * (1 + gRate)) / (waccDec - gRate);
+        const ev = sumPV + tv * termDF;
+        price = (ev - netDebt) / shares;
+      }
+    }
+    if (method === 'exit-multiple' || price === null) {
+      const tv = lastEBITDA * (inputs.exitMultiple || 10);
+      const ev = sumPV + tv * termDF;
+      price = (ev - netDebt) / shares;
+    }
+
+    if (price !== null && Number.isFinite(price)) {
+      return `$${price.toFixed(2)}/share`;
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
 // List models
 router.get('/', (req: AuthRequest, res: Response) => {
   const db = getDB();
   const models = db
     .prepare(
       `SELECT id, name, description, model_type as modelType, company_name as companyName,
-              created_at as createdAt, updated_at as updatedAt
+              summary, created_at as createdAt, updated_at as updatedAt
        FROM models WHERE user_id = ? ORDER BY updated_at DESC`
     )
     .all(req.userId);
@@ -87,15 +161,19 @@ router.put('/:id', (req: AuthRequest, res: Response) => {
     return;
   }
 
+  // Compute valuation summary for dashboard cards
+  const summary = computeSummary(dataStr);
+
   db.prepare(
     `UPDATE models
      SET name = COALESCE(?, name),
          company_name = COALESCE(?, company_name),
          description = COALESCE(?, description),
          data = ?,
+         summary = ?,
          updated_at = datetime('now')
      WHERE id = ?`
-  ).run(name, companyName, description, dataStr, req.params.id);
+  ).run(name, companyName, description, dataStr, summary, req.params.id);
 
   // Create version entry
   const versionId = uuidv4();
@@ -189,9 +267,12 @@ router.post('/:id/versions/:vid/restore', (req: AuthRequest, res: Response) => {
     return;
   }
 
+  // Recompute summary from restored version
+  const summary = computeSummary(version.data);
+
   db.prepare(
-    `UPDATE models SET data = ?, updated_at = datetime('now') WHERE id = ?`
-  ).run(version.data, req.params.id);
+    `UPDATE models SET data = ?, summary = ?, updated_at = datetime('now') WHERE id = ?`
+  ).run(version.data, summary, req.params.id);
 
   const updated = db
     .prepare(

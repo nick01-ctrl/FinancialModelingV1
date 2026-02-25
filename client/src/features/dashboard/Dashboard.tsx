@@ -12,7 +12,6 @@ export default function Dashboard() {
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [showNewModal, setShowNewModal] = useState(false);
 
   const filtered = models?.filter(
     (m) =>
@@ -93,6 +92,11 @@ export default function Dashboard() {
                 <h3 className="model-card-name">{model.name}</h3>
                 {model.companyName && (
                   <p className="model-card-company">{model.companyName}</p>
+                )}
+                {model.summary && (
+                  <p className="model-card-summary">
+                    DCF: {model.summary}
+                  </p>
                 )}
                 <p className="model-card-date">
                   Last modified: {new Date(model.updatedAt).toLocaleDateString()}
