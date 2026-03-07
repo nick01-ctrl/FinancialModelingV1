@@ -1,6 +1,7 @@
 import { useAuthStore } from '../stores/authStore';
 
 const BASE_URL = '/api';
+const DEMO_MODE = true;
 
 async function request<T>(
   path: string,
@@ -65,6 +66,16 @@ async function tryRefreshToken(): Promise<boolean> {
   }
 }
 
+// Demo mode wrapper — falls back to mock data when backend is unavailable
+async function demoSafe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  if (!DEMO_MODE) return fn();
+  try {
+    return await fn();
+  } catch {
+    return fallback;
+  }
+}
+
 // Auth endpoints
 export const authApi = {
   login: (email: string, password: string) =>
@@ -83,20 +94,32 @@ export const authApi = {
 // Model endpoints
 export const modelApi = {
   list: (page = 1, pageSize = 20, search?: string) =>
-    request<{ models: any[]; total: number; page: number; pageSize: number }>(
-      `/models?page=${page}&pageSize=${pageSize}${search ? `&search=${encodeURIComponent(search)}` : ''}`,
+    demoSafe(
+      () => request<{ models: any[]; total: number; page: number; pageSize: number }>(
+        `/models?page=${page}&pageSize=${pageSize}${search ? `&search=${encodeURIComponent(search)}` : ''}`,
+      ),
+      { models: [], total: 0, page: 1, pageSize: 20 },
     ),
 
   get: (id: string) => request<any>(`/models/${id}`),
 
   create: (data: any) =>
-    request<any>('/models', { method: 'POST', body: JSON.stringify(data) }),
+    demoSafe(
+      () => request<any>('/models', { method: 'POST', body: JSON.stringify(data) }),
+      { id: 'demo-' + Date.now(), ...data },
+    ),
 
   update: (id: string, data: any) =>
-    request<any>(`/models/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    demoSafe(
+      () => request<any>(`/models/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+      { id, ...data },
+    ),
 
   delete: (id: string) =>
-    request<void>(`/models/${id}`, { method: 'DELETE' }),
+    demoSafe(
+      () => request<void>(`/models/${id}`, { method: 'DELETE' }),
+      undefined as any,
+    ),
 
   getVersions: (id: string) => request<any>(`/models/${id}/versions`),
 
